@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Hugo's Inisight Project </title>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+	<link rel="stylesheet" type="text/css" href="static/style.css" />
+  	<!-- modernizr enables HTML5 elements and feature detects -->
+	<script type="text/javascript" src="static/modernizr-1.5.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCU1-iEeM6T-ekjCw7AOXu3t-BdkrKuXWk">
+	</script>
+  	<!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU1-iEeM6T-ekjCw7AOXu3t-BdkrKuXWk" type="text/javascript"></script> --> 
+  	<script src="static/map.js"></script>
+  	<script src="http://code.highcharts.com/highcharts.js"></script>
+  	<script type="text/javascript">
+
+  	</script>
+</head>
+
+<body>
+	<div id="main">
+		<div id="site_content">
+			<div class="content_item">
+				<h3> Real time view of web traffic to yelp businesses </h3>
+			</div>
+			<div id="map_container">
+				<div id="map-canvas"></div>
+			</div>
+
+			<div class="content_item" id='chart_container' style="width:100%; height:400px;">
+				<script>
+					a = '{{data1}}'
+
+				  	business_data = JSON.parse('{{data1 | safe}}');
+  					traffic_data = JSON.parse('{{data2 | safe}}');
+  					console.log(business_data);
+					console.log(traffic_data);
+					var date = new Date();
+					var b_id = traffic_data.keys()[0]
+					time_axis = traffic_data[b_id]['times'];
+					visits = traffic_data[b_id]['visits'];
+
+					// function gaussianRandom(start, end) {
+ 				// 		function gaussianRand() {
+					// 	  var rand = 0;
+					// 	  for (var i = 0; i < 6; i += 1) {
+					// 	    rand += Math.random();
+					// 	  }
+					// 	  return rand / 6;
+					// 	}
+ 				// 		 return Math.floor(start + gaussianRand() * (end - start + 1));
+					// }
+
+					// for (i = 0; i < 3600; i++) {
+					// 	time_axis.push(date.toISOString())
+					// 	visits.push(gaussianRandom(0, 100))
+					// }
+
+					$(function () { 
+					    var myChart = Highcharts.chart('chart_container', {
+					        chart: {
+					            type: 'line',
+					            zoomType: 'x'
+					        },
+					        title: {
+					            text: 'Web Traffic'
+					        },
+					        xAxis: {
+					            categories: time_axis
+					        },
+					        yAxis: {
+					            title: {
+					                text: 'Visits'
+					            }
+					        },
+					        series: [{
+					            name: 'Visits',
+					            data: visits
+					        },
+					        ]
+					    });
+					});
+				</script>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
