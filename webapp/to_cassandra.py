@@ -43,11 +43,8 @@ def get_flattened_businesses(data_file_name):
 	businesses = []
 	with open(data_file_name, 'r') as responses:
 		for resp in responses:
-			try:
-				data = json.loads(resp)['businesses']
-				businesses.extend(data)
-			except:
-				pass
+			data = json.loads(resp)['businesses']
+			businesses.extend(data)
 	return businesses
 
 # CREATE TABLE yelp_data.business_data (
@@ -57,10 +54,10 @@ def get_flattened_businesses(data_file_name):
 #     city text,
 #     state text,
 #     postal_code text,
-#     latitude text,
-#     longitude text,
-#     stars text,
-#     review_count text,
+#     latitude float,
+#     longitude float,
+#     stars float,
+#     review_count int,
 #     is_open boolean,
 #     categories text, #switch to semicolon separated vals, inschema just text
 
@@ -83,18 +80,13 @@ def format_row(row):
 			row[index] = value.encode('utf-8')
 	return row
 
-def no_comma(s):
-	if isinstance(s, basestring):
-		return s.replace(',', '')
-	return s
-
 def write_business_data_csv(data, destination_file):
 	with open(destination_file, 'w') as csv_file:
 		for business in data:
 			row = []
 			row.append(business['id']) 
 			row.append(business['name']) 
-			row.append(business['location']['display_address'][0]) 
+			row.append(''.join(business['location']['display_address'])) 
 			row.append(business['location']['city']) 
 			row.append(business['location']['state'])
 			row.append(business['location']['zip_code'])
@@ -104,47 +96,30 @@ def write_business_data_csv(data, destination_file):
 			row.append(business['review_count'])
 			row.append(not business['is_closed'])
 			row.append(format_attributes(business['categories']))
-			for column_index in range(len(row)):
-				row[column_index] = no_comma(row[column_index])
 			try:
 				w = csv.writer(csv_file)
 				w.writerow(format_row(row))
 			except UnicodeEncodeError as e:
 				print ('Encoding error detected: ', e)
 
-# def fix_types(destination_file):
-# 	lines = []
-# 	with open(destination_file, 'r') as data:
-# 		for line in data:
-# 			lines.append(line)
-# 		print type(line), '******'
-# 	with open(destination_file, 'w') as data:
-# 		for line in lines:
-# 			values = line.split(',')
-# 			values[6] = float(values[6])
-# 			values[7] = float(values[7])
-# 			values[8] = float(values[8])
-# 			values[9] = int(values[9])
-# 			data.write(','.join(values))
-# **1
-# (u'distance', 490.5510042868)
-# (u'is_closed', False)
-# (u'rating', 4.5)
-# (u'name', u'Brooklyn Bridge Park')
-# (u'transactions', [])
-# (u'url', u'https://www.yelp.com/biz/brooklyn-bridge-park-brooklyn-3?adjust_creative=19jspXUrNQpBfi9cKzKdPg&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=19jspXUrNQpBfi9cKzKdPg')
-# (u'coordinates', {u'latitude': 40.7016262778116, u'longitude': -73.9972114562988})
-# (u'phone', u'+17182229939')
-# (u'image_url', u'https://s3-media3.fl.yelpcdn.com/bphoto/vtdWyO6PvxhUGqGAzIQvmw/o.jpg')
-# (u'location', {u'city': u'Brooklyn', u'display_address': [u'334 Furman St', u'Brooklyn, NY 11201'], u'country': u'US', u'address2': None, u'address3': u'', u'state': u'NY', u'address1': u'334 Furman St', u'zip_code': u'11201'})
-# (u'display_phone', u'(718) 222-9939')
-# (u'review_count', 449)
-# (u'id', u'brooklyn-bridge-park-brooklyn-3')
-# (u'categories', [{u'alias': u'parks', u'title': u'Parks'}])
+def fix_types(destination_file):
+	lines = []
+	with open(destination_file, 'r') as data:
+		for line in data:
+			lines.append(line)
+		print type(line), '******'
+	with open(destination_file, 'w') as data:
+		for line in lines:
+			values = line.split(',')
+			values[6] = float(values[6])
+			values[7] = float(values[7])
+			values[8] = float(values[8])
+			values[9] = int(values[9])
+			data.write(','.join(values))
 
 if __name__ == '__main__':
 	b_file = 'nyc_businesses'
 	destination_file = 'nyc_businesses.csv'
-	businesses = get_flattened_businesses(b_file) # *1
+	businesses = get_flattened_businesses(b_file)
 	write_business_data_csv(businesses, destination_file)
-	# fix_types(destination_file)
+	fix_types(destination_file)

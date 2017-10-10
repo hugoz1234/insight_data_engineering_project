@@ -5,6 +5,7 @@ CREATE TABLE yelp_data.traffic_data (
     day text,
     visit_time timestamp,
     visits int,
+    user_id text,
     PRIMARY KEY ((business_id, day), visit_time)
 ) WITH bloom_filter_fp_chance = 0.01
     AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
@@ -26,6 +27,7 @@ CREATE TABLE yelp_data.latest_traffic_data (
     day text,
     visit_time timestamp,
     visits int,
+    user_id text,
     PRIMARY KEY ((business_id, day), visit_time)
 ) WITH CLUSTERING ORDER BY (visit_time DESC)
     AND default_time_to_live = 60

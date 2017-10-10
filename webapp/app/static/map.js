@@ -1,4 +1,4 @@
-var NYC = new google.maps.LatLng(40.758896, -73.985130);
+var NYC = new google.maps.LatLng(40.714185, -74.003256);
 var markers = [];
 var map;
 
@@ -9,29 +9,51 @@ function initialize() {
     };
     map = new google.maps.Map(document.getElementById('map-canvas'),
 			      mapOptions);
+    update_values();
 }
 
-// function update_values() {
-// 	$.getJSON('/realtime',
-//               function(data) {
-//                 //cabs = data.cabs
-// 				//console.log(cabs)
-// 				clearMarkers();
-// 				for (var i = 0; i < /*cabs.length*/; i = i + 1) {
-// 				      //addMarker(new google.maps.LatLng(cabs[i].lat, cabs[i].lng));
-// 				}
-// 				});
-//     window.setTimeout(update_values, 5000);
-// }
+function update_values() {
+	var no_data = false;
+	$.getJSON('/get_realtime_businesses',
+              function(data) {
+                businesses = data.business_data;
+                if (businesses.length === 0 || businesses === undefined) {
+                	no_data = true;
+                }
+                //console.log(businesses)
+				clearMarkers();
+				for (var key in businesses) {
+					lat = businesses[key]['latitude'];
+					lng = businesses[key]['longitude'];
+					b_id = businesses[key]['business_id'];
+					name = businesses[key]['name']
+				    addMarker(new google.maps.LatLng(lat, lng), b_id, name);
+				}
+				});
+	if (no_data){
+		update_values();
+	}else {
+    	window.setTimeout(update_values, 30000);
+	}
+}
 
-// update_values();
-
-function addMarker(position) {
-    markers.push(new google.maps.Marker({
+function addMarker(position, b_id, name) {
+	var marker = new google.maps.Marker({
 		position: position,
 		map: map,
-    }));
+		title: 'Click to analyze ' + name,
+    });
+    marker.metadata = {'b_id': b_id, 'name': name}
+
+    marker.addListener('click', function(){
+    	//console.log("**GET " + marker.metadata['b_id'] + " WITH NAME " + marker.metadata['name']);
+    	display_timeseries(marker.metadata['b_id'], marker.metadata['name']);
+    });
+
+    markers.push(marker);
 }
+
+
 function clearMarkers() {
     for (var i = 0; i < markers.length; i++) {
 		markers[i].setMap(null);

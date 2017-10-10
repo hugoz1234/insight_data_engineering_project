@@ -41,8 +41,13 @@ import re
 # 		count += len(jsonobject['businesses'])
 # 		print count
 
-with open('delete_me.txt', 'w') as x:
-	x.write(1.0)
+if __name__ == '__main__':
+    with open('nyc_businesses.csv', 'r') as f:
+        for line in f:
+            print line
+            print (line.split(','))
+            print (len(line.split(',')))
+            break
 
 
 		
