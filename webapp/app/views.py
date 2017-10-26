@@ -8,11 +8,12 @@ from werkzeug.contrib.cache import SimpleCache
 from app import app
 from . import cassandra_grabber
 
+CASSANDRA_CLUSTER_PUBLIC_IP = None
 
 cassandra = CassandraCluster()
 cache = SimpleCache()
 
-app.config['CASSANDRA_NODES'] = ['ec2-34-235-10-75.compute-1.amazonaws.com']
+app.config['CASSANDRA_NODES'] = [CASSANDRA_CLUSTER_PUBLIC_IP]
 
 def get_data():
     cache.clear()
@@ -23,16 +24,12 @@ def get_data():
     cache.set('traffic_data', time_series, 60)
     cache.set('scalar_average', surge_metrics[0], 60)
     cache.set('time_series_avg', surge_metrics[1], 60)
-    print "CONTENTS OF CACHE** "
-    print "SHOULD ONLY BE DISPLAYING ", len(business_data) , " BUSINESSES"
-    # print "THESE SPECIFICLY ", cache.get('traffic_data').keys()
 
 @app.route('/')
 @app.route('/index')
 def index():
     get_data()
     return render_template('index.html')
-    #, maps_data=json.dumps(data[0]), traffic_data=json.dumps(data[1]))
 
 @app.route('/get_realtime_traffic')
 def get_realtime_traffic():

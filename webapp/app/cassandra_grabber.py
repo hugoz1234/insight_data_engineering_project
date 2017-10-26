@@ -3,12 +3,6 @@ from collections import Counter
 from datetime import datetime, timedelta
 import heapq
 
-#FOR every business in NYC
-# get everyvisit in the last 30 seconds
-# count number visits persecond (skip for now)
-# put time series and count in highchart && location in google map
-
-# SURGE_THRESHOLD (total average, [timeseries average])
 
 N_BUSIEST_BUSINESSES = 10
 
@@ -36,11 +30,8 @@ def get_time_series(traffic):
             if ts not in aux_helper[b_id]:
                 aux_hash[b_id].append((ts, 0))
 
-    # print "FINISHED AUX HASH: ", len(aux_hash)
-    # print aux_hash
     for b in aux_hash:
         ts_sorted = sorted(aux_hash[b], key=lambda x: datetime.strptime(x[0], "%Y-%m-%d %H:%M:%S"))
-        # print ts_sorted
         unzipped = zip(*ts_sorted)
         business_time_series[b] = {'times': list(unzipped[0]), 'visits':list(unzipped[1])}
 
@@ -68,9 +59,6 @@ def recalculate_surge(time_series):
     for b_id in time_series:
         visits = time_series[b_id]['visits']
         time_stamps = time_series[b_id]['times']
-        # if visits:
-        #     total_average += sum(visits)
-        #     average_time_series = [x + y for x, y in zip(average_time_series, visits)]
         if visits:
             for ts_index in range(len(visits)):
                 av_time_series_counter[time_stamps[ts_index]] += visits[ts_index]
@@ -82,7 +70,6 @@ def recalculate_surge(time_series):
     total_average = total_average/total_businesses
     sorted_ts_tuples = sorted(av_time_series_counter.items(), key=lambda x: datetime.strptime(x[0], "%Y-%m-%d %H:%M:%S"))
     average_time_series = zip(*sorted_ts_tuples)[1]
-    # average_time_series = [x/total_businesses for x in average_time_series]
     return (total_average, average_time_series)
 
 
@@ -96,8 +83,6 @@ def get_traffic_and_bussinesses(rows):
         d['visit_time'] = str(row.visit_time)
         d['visits'] = row.visits
         traffic.append(d)
-    if len(traffic) == 0:
-        print "WTFFFFFFFFF"
     all_time_series = get_time_series(traffic)
     surge_metrics = recalculate_surge(all_time_series)
     surging_time_series = remove_non_surging_businesses(all_time_series, surge_metrics[0])
@@ -121,31 +106,23 @@ def get_businessdata_query_string(businesses):
 def send_business_data_to_dicts(rows):
     """Return list of dicts"""
     businesses = []
-    b_ids = [] #TODO delete me
     for row in rows:
         d = {}
         d['business_id'] = row.business_id
-        b_ids.append(row.business_id)
         d['name'] = row.name
         d['address'] = row.address
         d['latitude'] = row.latitude
         d['longitude'] = row.longitude
         businesses.append(d)
-    # print "THESE ARE THE BUSINESSES I GOT: ", b_ids
     return businesses
 
 
 def get_data(session):
     """
-    > Grabs all business traffic in last 30 seconds.
-        TODO: change to 30 seconds, also might be grabbing too much data?
-    > Filters out all businesses with no surges (right now based on arbitrary surge, later use historical average)
-    > Display Google maps pins of surging businesses
-    > Upon clicking on pin, display time series graph
+    > Grabs all business traffic in last 60 seconds.
     """
     present = (datetime.utcnow() + timedelta(seconds=1)).replace(microsecond=0)
     past = (present - timedelta(seconds=61)).replace(microsecond=0)
-    # print '#####################', past, present
 
     cql = 'SELECT * FROM latest_traffic_data \
     WHERE visit_time > \'{past}\' ALLOW FILTERING'.format(past=past)

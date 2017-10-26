@@ -11,5 +11,4 @@ function initialize(){
 	});
 }
 
-//document.addEventListener("DOMContentLoaded", initialize);
 $(document).ready(initialize);

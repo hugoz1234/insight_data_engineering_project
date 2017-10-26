@@ -20,7 +20,6 @@ function update_values() {
                 if (businesses.length === 0 || businesses === undefined) {
                 	no_data = true;
                 }
-                //console.log(businesses)
 				clearMarkers();
 				for (var key in businesses) {
 					lat = businesses[key]['latitude'];
@@ -46,7 +45,6 @@ function addMarker(position, b_id, name) {
     marker.metadata = {'b_id': b_id, 'name': name}
 
     marker.addListener('click', function(){
-    	//console.log("**GET " + marker.metadata['b_id'] + " WITH NAME " + marker.metadata['name']);
     	display_timeseries(marker.metadata['b_id'], marker.metadata['name']);
     });
 

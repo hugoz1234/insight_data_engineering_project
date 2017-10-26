@@ -5,7 +5,7 @@ var myChart;
 function display_timeseries(b_id, name){
 	var time_series_data = $.getJSON('/get_realtime_traffic', function(data){
 		var display_data = data['traffic_data'][b_id];
-		console.log(display_data['visits'].length, '*******')
+		// console.log(display_data['visits'].length, '*******')
 		var time_series_avg = data['time_series_avg'];
 		if (display_data !== undefined || display_data === {}){
 			myChart = Highcharts.chart('chart_container', {
