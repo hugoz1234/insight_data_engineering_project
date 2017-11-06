@@ -3,11 +3,13 @@ _A real-time web traffic analytics dashboard_
 
 ## Motivation
 
-In the age of **BIG** data, the scale of industry applications has outpaced the scope of analytical tooling. This presents a real challenge for engineers who are tasked with developing these tools. This project is meant to serve as an exercise in building a real-time distributed pipeline. 
+In the age of big data, the scale of industry applications has outpaced the scope of analytical tooling. This presents a real challenge for engineers who are tasked with developing these tools. This project is meant to serve as an exercise in building a real-time distributed pipeline. 
 
 ## The Deliverable -- Anomaly Detection 
 
-The contrived scenario is that Yelp has hired me to produce the first iteration of a dashboard product using their traffic accross all platforms. The key feature of focus is to provide 
+The contrived scenario: Yelp has hired me to produce the first iteration of a dashboard product using their traffic accross all platforms. The key feature will be to alert businesses of anomolous surges in their webtraffic based on some average. The assumption is that surges in web traffic correspond to surges in demand. This project aims to alert business owners of these anomalies.
+
+The dash board is a google maps view that will display the top 10 businesses experiencing the largest surges. Clicking on a business in the map will bring up a time series graph of its webtraffic the last 60 seconds and the referenced average. The front end is updated every 60 seconds.  
 
 ## The Data
 
